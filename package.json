@@ -1,0 +1,22 @@
+{
+    "name": "Toxic Botz",
+    "version": "1.1.0",
+    "description": ".",
+    "main": "toxic",
+    "scripts": {
+        "start": "node toxic"
+    },
+    "dependencies": {
+        "@whiskeysockets/baileys": "^6.7.18",
+        "axios": "^1.6.0",
+        "body-parser": "^1.20.3",
+         "fs": "latest",
+        "chalk": "^4.1.2",
+        "pino": "^9.5.0",
+        "@octokit/rest": "latest",
+        "readline-sync": "^1.4.10",
+        "telegraf": "^4.16.3",
+        "crypto": "latest",
+        "moment-timezone": "latest"
+    }
+}
