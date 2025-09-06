@@ -9,9 +9,6 @@ const {
 const pino = require("pino");
 const chalk = require("chalk");
 const { BOT_TOKEN, moderatorID } = require("./tokenbot/config");
-const axios = require("axios");
-const premiumFile = "./toxicuser/premiumuser.json";
-const ownerFile = "./toxicuser/owneruser.json";
 
 const bot = new Telegraf(BOT_TOKEN);
 bot.use(session());
@@ -134,10 +131,10 @@ bot.command("start", async (ctx) => {
 ◈━━━━━━━━━━━━━━━━◈
 │❒ Commands
 ◈━━━━━━━━━━━━━━━━◈
-• /addprem <id> → Add premium user
-• /delprem <id> → Remove premium user
+• /addprem <code>id</code> → Add premium user
+• /delprem <code>id</code> → Remove premium user
 • /cekprem → Check premium status
-• /pairing <number> → Start WhatsApp pairing
+• /pairing <code>number</code> → Start WhatsApp pairing
 
 ◈━━━━━━━━━━━━━━━━◈
 │❒ Delay Commands
@@ -158,13 +155,24 @@ bot.command("start", async (ctx) => {
 ◈━━━━━━━━━━━━━━━━◈
 `;
 
-  await ctx.replyWithPhoto(randomImage, {
-    caption: caption,
-    parse_mode: "HTML",
-    ...Markup.inlineKeyboard([
-      [Markup.button.url("Developer", "https://t.me/xh_clinton")],
-    ]),
-  });
+  try {
+    await ctx.replyWithPhoto(randomImage, {
+      caption: caption,
+      parse_mode: "HTML",
+      ...Markup.inlineKeyboard([
+        [Markup.button.url("Developer", "https://t.me/xh_clinton")],
+      ]),
+    });
+  } catch (error) {
+    console.error(
+      chalk.red(
+        `\n◈━━━━━━━━━━━━━━━━◈\n│❒ Error in /start command: ${error.message}\n◈━━━━━━━━━━━━━━━━◈`
+      )
+    );
+    ctx.reply(
+      `\n◈━━━━━━━━━━━━━━━━◈\n│❒ Error: Failed to send welcome message.\n│❒ Please try again later.\n◈━━━━━━━━━━━━━━━━◈`
+    );
+  }
 });
 
 // === COMMAND DELAYHARD ===
@@ -216,7 +224,7 @@ bot.command("addprem", checkOwner, (ctx) => {
   const args = ctx.message.text.split(" ");
   if (args.length < 2) {
     return ctx.reply(
-      `\n◈━━━━━━━━━━━━━━━━◈\n│❒ Error: Invalid format!\n│❒ Use: <code>/addprem <user_id></code>\n│❒ Example: <code>/addprem 123456789</code>\n◈━━━━━━━━━━━━━━━━◈`,
+      `\n◈━━━━━━━━━━━━━━━━◈\n│❒ Error: Invalid format!\n│❒ Use: <code>/addprem &lt;id&gt;</code>\n│❒ Example: <code>/addprem 123456789</code>\n◈━━━━━━━━━━━━━━━━◈`,
       { parse_mode: "HTML" }
     );
   }
@@ -242,7 +250,7 @@ bot.command("delprem", checkOwner, (ctx) => {
   const args = ctx.message.text.split(" ");
   if (args.length < 2)
     return ctx.reply(
-      `\n◈━━━━━━━━━━━━━━━━◈\n│❒ Error: Invalid format!\n│❒ Use: <code>/delprem <id></code>\n◈━━━━━━━━━━━━━━━━◈`,
+      `\n◈━━━━━━━━━━━━━━━━◈\n│❒ Error: Invalid format!\n│❒ Use: <code>/delprem &lt;id&gt;</code>\n◈━━━━━━━━━━━━━━━━◈`,
       { parse_mode: "HTML" }
     );
   const userId = args[1];
@@ -267,7 +275,7 @@ bot.command("pairing", checkOwner, async (ctx) => {
   const args = ctx.message.text.split(" ");
   if (args.length < 2)
     return ctx.reply(
-      `\n◈━━━━━━━━━━━━━━━━◈\n│❒ Error: Invalid format!\n│❒ Use: <code>/pairing <number></code>\n◈━━━━━━━━━━━━━━━━◈`,
+      `\n◈━━━━━━━━━━━━━━━━◈\n│❒ Error: Invalid format!\n│❒ Use: <code>/pairing &lt;number&gt;</code>\n◈━━━━━━━━━━━━━━━━◈`,
       { parse_mode: "HTML" }
     );
   const phoneNumber = args[1].replace(/[^0-9]/g, "");
