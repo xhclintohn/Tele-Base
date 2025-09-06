@@ -1,5 +1,6 @@
 const { Telegraf, Markup, session } = require("telegraf");
 const fs = require("fs");
+const path = require("path"); // Added for directory handling
 const {
   makeWASocket,
   fetchLatestBaileysVersion,
@@ -19,6 +20,9 @@ const randomImages = [
   "https://files.catbox.moe/b90xbl.jpg",
   "https://files.catbox.moe/b90xbl.jpg",
 ];
+const ownerFile = "./toxicuser/owneruser.json"; // Define ownerFile
+const premiumFile = "./toxicuser/premiumuser.json"; // Define premiumFile
+
 const getRandomImage = () => randomImages[Math.floor(Math.random() * randomImages.length)];
 const getUptime = () => {
   const uptimeSeconds = process.uptime();
@@ -26,6 +30,35 @@ const getUptime = () => {
   const minutes = Math.floor((uptimeSeconds % 3600) / 60);
   const seconds = Math.floor(uptimeSeconds % 60);
   return `${hours}h ${minutes}m ${seconds}s`;
+};
+
+// Ensure ./toxicuser directory and JSON files exist
+const ensureFiles = () => {
+  const dir = "./toxicuser";
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+    console.log(
+      chalk.green(
+        "\n◈━━━━━━━━━━━━━━━━◈\n│❒ Created directory: ./toxicuser\n◈━━━━━━━━━━━━━━━━◈"
+      )
+    );
+  }
+  if (!fs.existsSync(ownerFile)) {
+    fs.writeFileSync(ownerFile, JSON.stringify(["8125991862"], null, 2)); // Initialize with your Telegram ID
+    console.log(
+      chalk.green(
+        `\n◈━━━━━━━━━━━━━━━━◈\n│❒ Created owner file: ${ownerFile}\n◈━━━━━━━━━━━━━━━━◈`
+      )
+    );
+  }
+  if (!fs.existsSync(premiumFile)) {
+    fs.writeFileSync(premiumFile, JSON.stringify([], null, 2));
+    console.log(
+      chalk.green(
+        `\n◈━━━━━━━━━━━━━━━━◈\n│❒ Created premium file: ${premiumFile}\n◈━━━━━━━━━━━━━━━━◈`
+      )
+    );
+  }
 };
 
 const startSesi = async () => {
@@ -66,12 +99,29 @@ const startSesi = async () => {
 };
 
 const loadJSON = (file) => {
-  if (!fs.existsSync(file)) return [];
-  return JSON.parse(fs.readFileSync(file, "utf8"));
+  try {
+    if (!fs.existsSync(file)) return [];
+    return JSON.parse(fs.readFileSync(file, "utf8"));
+  } catch (error) {
+    console.error(
+      chalk.red(
+        `\n◈━━━━━━━━━━━━━━━━◈\n│❒ Error loading JSON file ${file}: ${error.message}\n◈━━━━━━━━━━━━━━━━◈`
+      )
+    );
+    return [];
+  }
 };
 
 const saveJSON = (file, data) => {
-  fs.writeFileSync(file, JSON.stringify(data, null, 2));
+  try {
+    fs.writeFileSync(file, JSON.stringify(data, null, 2));
+  } catch (error) {
+    console.error(
+      chalk.red(
+        `\n◈━━━━━━━━━━━━━━━━◈\n│❒ Error saving JSON file ${file}: ${error.message}\n◈━━━━━━━━━━━━━━━━◈`
+      )
+    );
+  }
 };
 
 let ownerUsers = loadJSON(ownerFile);
@@ -305,6 +355,7 @@ bot.command("pairing", checkOwner, async (ctx) => {
       `\n◈━━━━━━━━━━━━━━━━◈\n│❒ Starting WhatsApp session...\n◈━━━━━━━━━━━━━━━━◈`
     )
   );
+  ensureFiles(); // Create directory and files if they don't exist
   await startSesi();
   console.log(
     chalk.green(
